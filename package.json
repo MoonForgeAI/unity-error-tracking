@@ -1,0 +1,31 @@
+{
+  "name": "com.moonforge.errortracking",
+  "version": "1.0.0",
+  "displayName": "MoonForge Error Tracking",
+  "description": "Production-ready error tracking for Unity games. Captures crashes, exceptions, and network errors with full context for debugging.",
+  "unity": "2021.3",
+  "unityRelease": "0f1",
+  "documentationUrl": "https://docs.moonforge.dev/unity-sdk/error-tracking",
+  "changelogUrl": "https://docs.moonforge.dev/unity-sdk/error-tracking/changelog",
+  "licensesUrl": "https://docs.moonforge.dev/unity-sdk/license",
+  "dependencies": {},
+  "keywords": [
+    "error-tracking",
+    "crash-reporting",
+    "debugging",
+    "analytics",
+    "monitoring"
+  ],
+  "author": {
+    "name": "MoonForge",
+    "email": "support@moonforge.dev",
+    "url": "https://moonforge.dev"
+  },
+  "samples": [
+    {
+      "displayName": "Basic Integration",
+      "description": "Shows how to initialize and use MoonForge Error Tracking",
+      "path": "Samples~/BasicIntegration"
+    }
+  ]
+}
