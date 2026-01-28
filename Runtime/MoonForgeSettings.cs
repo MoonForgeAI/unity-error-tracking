@@ -47,7 +47,7 @@ namespace MoonForge.ErrorTracking
 
         [Header("═══ ADVANCED (Optional) ═══")]
         [Tooltip("API endpoint base URL - the URL of your MoonForge collector service (without /api/errors)")]
-        public string apiEndpoint = "https://collector.moonforge.co";
+        public string apiEndpoint = "https://moonforge-collector-wso5qviqda-uc.a.run.app";
 
         [Tooltip("Capture unhandled C# exceptions")]
         public bool captureUnhandledExceptions = true;
