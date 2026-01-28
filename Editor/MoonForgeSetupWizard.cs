@@ -381,7 +381,8 @@ namespace MoonForge.ErrorTracking.Editor
                 using (var client = new System.Net.Http.HttpClient())
                 {
                     client.Timeout = TimeSpan.FromSeconds(10);
-                    var response = await client.GetAsync(_settings.apiEndpoint.Replace("/errors", "/health"));
+                    var healthUrl = _settings.apiEndpoint.TrimEnd('/') + "/health";
+                    var response = await client.GetAsync(healthUrl);
 
                     if (response.IsSuccessStatusCode)
                     {
