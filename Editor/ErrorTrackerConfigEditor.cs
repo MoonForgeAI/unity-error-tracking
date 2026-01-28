@@ -114,31 +114,5 @@ namespace MoonForge.ErrorTracking.Editor
             }
         }
 
-        /// <summary>
-        /// Create config from menu
-        /// </summary>
-        [MenuItem("Assets/Create/MoonForge/Error Tracker Config")]
-        public static void CreateConfig()
-        {
-            var config = ScriptableObject.CreateInstance<ErrorTrackerConfig>();
-
-            var path = AssetDatabase.GetAssetPath(Selection.activeObject);
-            if (string.IsNullOrEmpty(path))
-            {
-                path = "Assets";
-            }
-            else if (!System.IO.Directory.Exists(path))
-            {
-                path = System.IO.Path.GetDirectoryName(path);
-            }
-
-            var assetPath = AssetDatabase.GenerateUniqueAssetPath($"{path}/MoonForgeErrorTrackerConfig.asset");
-
-            AssetDatabase.CreateAsset(config, assetPath);
-            AssetDatabase.SaveAssets();
-
-            EditorUtility.FocusProjectWindow();
-            Selection.activeObject = config;
-        }
     }
 }
