@@ -36,13 +36,13 @@ That's it! No scripts to write, no GameObjects to create.
 ### Using Unity Package Manager (Recommended)
 
 1. Open **Window > Package Manager**
-2. Click **"+" > "Add package from git URL..."**
-3. Enter: `https://github.com/moonforge/unity-error-tracking.git`
+2. Click **"+" > "Add package from disk..."**
+3. Navigate to `moonforge-unity-sdk/MoonForgeErrorTracking/package.json` and select it
 
 ### Manual Installation
 
-1. Download the latest release
-2. Copy `MoonForgeErrorTracking/` to your project's `Packages/` folder
+1. Copy the entire `MoonForgeErrorTracking/` folder to your Unity project's `Packages/` folder
+2. Unity will automatically detect and import the package
 
 ---
 

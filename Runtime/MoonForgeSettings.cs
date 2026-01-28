@@ -46,8 +46,8 @@ namespace MoonForge.ErrorTracking
         // ═══════════════════════════════════════════════════════════════════
 
         [Header("═══ ADVANCED (Optional) ═══")]
-        [Tooltip("API endpoint - only change if using self-hosted")]
-        public string apiEndpoint = "https://collector.moonforge.dev/api/v1/errors";
+        [Tooltip("API endpoint base URL - the URL of your MoonForge collector service (without /api/errors)")]
+        public string apiEndpoint = "https://collector.moonforge.co";
 
         [Tooltip("Capture unhandled C# exceptions")]
         public bool captureUnhandledExceptions = true;
