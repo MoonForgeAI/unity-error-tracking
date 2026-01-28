@@ -403,24 +403,54 @@ namespace MoonForge.ErrorTracking.Editor
             Repaint();
         }
 
-        private void SendTestError()
+        private async void SendTestError()
         {
             if (_settings == null || !_settings.IsValid) return;
 
-            // Ensure tracker is initialized
-            if (MoonForgeErrorTracker.Instance == null)
-            {
-                MoonForgeAutoInitializer.Initialize();
-            }
+            _testConnectionResult = "Sending test error...";
+            Repaint();
 
-            // Send test error
             try
             {
-                MoonForgeErrorTracker.Instance.CaptureMessage(
-                    "Test error from MoonForge Setup Wizard",
-                    ErrorLevel.Info
-                );
-                _testConnectionResult = "✓ Test error sent! Check your dashboard in a few seconds.";
+                // Send test error directly via HTTP (works in Editor without Play Mode)
+                using (var client = new System.Net.Http.HttpClient())
+                {
+                    client.Timeout = TimeSpan.FromSeconds(10);
+                    var url = _settings.apiEndpoint.TrimEnd('/') + "/api/errors";
+
+                    var payload = $@"{{
+                        ""type"": ""error"",
+                        ""payload"": {{
+                            ""game"": ""{_settings.gameId}"",
+                            ""errorType"": ""custom"",
+                            ""errorCategory"": ""handled"",
+                            ""errorLevel"": ""info"",
+                            ""message"": ""Test error from MoonForge Setup Wizard"",
+                            ""device"": {{
+                                ""platform"": ""editor"",
+                                ""osVersion"": ""{SystemInfo.operatingSystem}"",
+                                ""deviceModel"": ""{SystemInfo.deviceModel}""
+                            }},
+                            ""appVersion"": ""{Application.version}"",
+                            ""buildNumber"": ""1"",
+                            ""unityVersion"": ""{Application.unityVersion}"",
+                            ""timestamp"": {DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}
+                        }}
+                    }}";
+
+                    var content = new System.Net.Http.StringContent(payload, System.Text.Encoding.UTF8, "application/json");
+                    var response = await client.PostAsync(url, content);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        _testConnectionResult = "✓ Test error sent! Check your dashboard.";
+                    }
+                    else
+                    {
+                        var responseBody = await response.Content.ReadAsStringAsync();
+                        _testConnectionResult = $"✗ Server returned {response.StatusCode}: {responseBody}";
+                    }
+                }
             }
             catch (Exception ex)
             {
