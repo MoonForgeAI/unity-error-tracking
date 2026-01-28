@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -351,12 +352,20 @@ namespace MoonForge.ErrorTracking.Editor
 
             await Task.Run(() =>
             {
-                using var archive = System.IO.Compression.ZipFile.Open(zipPath, System.IO.Compression.ZipArchiveMode.Create);
-                foreach (var file in files)
+                using (var archive = ZipFile.Open(zipPath, ZipArchiveMode.Create))
                 {
-                    if (File.Exists(file))
+                    foreach (var file in files)
                     {
-                        archive.CreateEntryFromFile(file, Path.GetFileName(file));
+                        if (File.Exists(file))
+                        {
+                            var entryName = Path.GetFileName(file);
+                            var entry = archive.CreateEntry(entryName);
+                            using (var entryStream = entry.Open())
+                            using (var fileStream = File.OpenRead(file))
+                            {
+                                fileStream.CopyTo(entryStream);
+                            }
+                        }
                     }
                 }
             });

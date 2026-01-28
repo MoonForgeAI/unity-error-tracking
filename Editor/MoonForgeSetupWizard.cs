@@ -409,8 +409,7 @@ namespace MoonForge.ErrorTracking.Editor
             // Ensure tracker is initialized
             if (MoonForgeErrorTracker.Instance == null)
             {
-                var config = _settings.ToFullConfig();
-                MoonForgeErrorTracker.Initialize(config);
+                MoonForgeAutoInitializer.Initialize();
             }
 
             // Send test error
@@ -418,7 +417,7 @@ namespace MoonForge.ErrorTracking.Editor
             {
                 MoonForgeErrorTracker.Instance.CaptureMessage(
                     "Test error from MoonForge Setup Wizard",
-                    ErrorSeverity.Info
+                    ErrorLevel.Info
                 );
                 _testConnectionResult = "✓ Test error sent! Check your dashboard in a few seconds.";
             }
