@@ -427,9 +427,9 @@ namespace MoonForge.ErrorTracking.Editor
                             ""errorLevel"": ""info"",
                             ""message"": ""Test error from MoonForge Setup Wizard"",
                             ""device"": {{
-                                ""platform"": ""editor"",
+                                ""platform"": ""android"",
                                 ""osVersion"": ""{SystemInfo.operatingSystem}"",
-                                ""deviceModel"": ""{SystemInfo.deviceModel}""
+                                ""deviceModel"": ""Unity Editor""
                             }},
                             ""appVersion"": ""{Application.version}"",
                             ""buildNumber"": ""1"",
