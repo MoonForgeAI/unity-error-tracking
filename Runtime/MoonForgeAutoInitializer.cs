@@ -19,7 +19,13 @@ namespace MoonForge.ErrorTracking
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void AutoInitialize()
         {
-            if (_initializationAttempted) return;
+            Debug.Log("[MoonForge] AutoInitialize called");
+
+            if (_initializationAttempted)
+            {
+                Debug.Log("[MoonForge] Already attempted initialization, skipping");
+                return;
+            }
             _initializationAttempted = true;
 
             var settings = MoonForgeSettings.Instance;
@@ -27,30 +33,27 @@ namespace MoonForge.ErrorTracking
             // Check if settings exist
             if (settings == null)
             {
-                #if UNITY_EDITOR
                 Debug.LogWarning("[MoonForge] Settings not found. Run 'MoonForge > Setup Error Tracking' to configure.");
-                #endif
                 return;
             }
+
+            Debug.Log($"[MoonForge] Settings loaded - enabled={settings.enabled}, enableInEditor={settings.enableInEditor}, gameId={settings.gameId}");
 
             // Check if SDK should be active
             if (!settings.ShouldBeActive)
             {
-                if (settings.debugMode)
-                {
-                    Debug.Log("[MoonForge] Error tracking disabled in current environment.");
-                }
+                Debug.Log($"[MoonForge] Error tracking disabled - ShouldBeActive=false (enabled={settings.enabled}, enableInEditor={settings.enableInEditor})");
                 return;
             }
 
             // Validate settings
             if (!settings.IsValid)
             {
-                #if UNITY_EDITOR
-                Debug.LogWarning("[MoonForge] Invalid Game ID. Please enter your Game ID via 'MoonForge > Setup Error Tracking'.");
-                #endif
+                Debug.LogWarning($"[MoonForge] Invalid Game ID: '{settings.gameId}'. Please enter your Game ID via 'MoonForge > Setup Error Tracking'.");
                 return;
             }
+
+            Debug.Log("[MoonForge] Settings valid, initializing tracker...");
 
             // Initialize the tracker
             try
@@ -58,14 +61,18 @@ namespace MoonForge.ErrorTracking
                 var config = settings.ToFullConfig();
                 var tracker = MoonForgeErrorTracker.Initialize(config);
 
-                if (tracker != null && settings.debugMode)
+                if (tracker != null)
                 {
-                    Debug.Log("[MoonForge] Error tracking initialized successfully!");
+                    Debug.Log($"[MoonForge] Error tracking initialized successfully! Endpoint: {config.apiEndpoint}");
+                }
+                else
+                {
+                    Debug.LogWarning("[MoonForge] Tracker.Initialize returned null");
                 }
             }
             catch (System.Exception ex)
             {
-                Debug.LogError($"[MoonForge] Failed to initialize: {ex.Message}");
+                Debug.LogError($"[MoonForge] Failed to initialize: {ex.Message}\n{ex.StackTrace}");
             }
         }
 
