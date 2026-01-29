@@ -63,12 +63,39 @@ namespace MoonForge.ErrorTracking
 
         private void OnLogMessageReceived(string condition, string stackTrace, LogType logType)
         {
+            // Skip our own debug logs to avoid recursion
+            if (condition.StartsWith("[MoonForge]")) return;
+
+            if (_config.debugMode)
+            {
+                Debug.Log($"[MoonForge] Log received: type={logType}, message={condition.Substring(0, Math.Min(50, condition.Length))}...");
+            }
+
             // Check if we should capture this log type
-            if (!ShouldCapture(logType)) return;
+            if (!ShouldCapture(logType))
+            {
+                if (_config.debugMode)
+                {
+                    Debug.Log($"[MoonForge] Skipping log type {logType} (not configured to capture)");
+                }
+                return;
+            }
 
             // Deduplicate rapid-fire errors
             var errorKey = $"{logType}:{condition}";
-            if (IsDuplicate(errorKey)) return;
+            if (IsDuplicate(errorKey))
+            {
+                if (_config.debugMode)
+                {
+                    Debug.Log($"[MoonForge] Skipping duplicate error");
+                }
+                return;
+            }
+
+            if (_config.debugMode)
+            {
+                Debug.Log($"[MoonForge] Capturing error: {logType} - {condition.Substring(0, Math.Min(100, condition.Length))}");
+            }
 
             var payload = CreatePayload(condition, stackTrace, logType);
             _onErrorCaptured?.Invoke(payload);

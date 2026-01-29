@@ -419,6 +419,11 @@ namespace MoonForge.ErrorTracking
 
         private void OnErrorCaptured(ErrorPayloadInner payload)
         {
+            if (_config.debugMode)
+            {
+                Debug.Log($"[MoonForge] OnErrorCaptured: {payload.errorLevel} - {payload.message?.Substring(0, Math.Min(50, payload.message?.Length ?? 0))}");
+            }
+
             // Add user context
             payload.userId = _userId;
             payload.sessionId = _sessionId;
@@ -427,6 +432,10 @@ namespace MoonForge.ErrorTracking
             var decision = _sampler.ShouldSample(payload);
             if (!decision.ShouldSend)
             {
+                if (_config.debugMode)
+                {
+                    Debug.Log($"[MoonForge] Error sampled out (rate={decision.SampleRate})");
+                }
                 return;
             }
 
@@ -435,6 +444,10 @@ namespace MoonForge.ErrorTracking
             // Check connectivity
             if (!_transport.HasConnectivity())
             {
+                if (_config.debugMode)
+                {
+                    Debug.Log("[MoonForge] No connectivity, storing offline");
+                }
                 if (_config.enableOfflineStorage)
                 {
                     _offlineStorage.Store(payload);
@@ -445,10 +458,18 @@ namespace MoonForge.ErrorTracking
             // Send or queue
             if (_config.enableBatching)
             {
+                if (_config.debugMode)
+                {
+                    Debug.Log("[MoonForge] Queuing error for batch send");
+                }
                 _batchQueue.Enqueue(payload);
             }
             else
             {
+                if (_config.debugMode)
+                {
+                    Debug.Log("[MoonForge] Sending error directly");
+                }
                 SendErrorDirectly(payload);
             }
         }
