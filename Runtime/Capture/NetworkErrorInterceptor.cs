@@ -164,15 +164,30 @@ namespace MoonForge.ErrorTracking
                     "bearer", "session", "sessionid", "session_id"
                 };
 
-                var queryParams = System.Web.HttpUtility.ParseQueryString(uri.Query);
+                // Parse query string manually (Unity doesn't have System.Web.HttpUtility)
+                var query = uri.Query.TrimStart('?');
                 var sanitizedParams = new List<string>();
 
-                foreach (string key in queryParams.AllKeys)
+                if (!string.IsNullOrEmpty(query))
                 {
-                    if (key == null) continue;
+                    var pairs = query.Split('&');
+                    foreach (var pair in pairs)
+                    {
+                        var keyValue = pair.Split(new[] { '=' }, 2);
+                        if (keyValue.Length == 0 || string.IsNullOrEmpty(keyValue[0])) continue;
 
-                    var value = sensitiveParams.Contains(key) ? "[REDACTED]" : queryParams[key];
-                    sanitizedParams.Add($"{key}={value}");
+                        var key = UnityEngine.Networking.UnityWebRequest.UnEscapeURL(keyValue[0]);
+                        var value = keyValue.Length > 1 ? keyValue[1] : "";
+
+                        if (sensitiveParams.Contains(key))
+                        {
+                            sanitizedParams.Add($"{keyValue[0]}=[REDACTED]");
+                        }
+                        else
+                        {
+                            sanitizedParams.Add(pair);
+                        }
+                    }
                 }
 
                 var sanitizedQuery = sanitizedParams.Count > 0
