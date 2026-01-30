@@ -61,6 +61,18 @@ namespace MoonForge.ErrorTracking.Analytics
                 return;
             }
 
+            // Check if coroutine runner is still valid and active (can happen during shutdown)
+            if (_coroutineRunner == null || !_coroutineRunner.gameObject.activeInHierarchy)
+            {
+                if (_config.debugMode)
+                {
+                    Debug.Log("[MoonForge Analytics] Coroutine runner inactive, queuing event for next session");
+                }
+                QueueOfflineEvent(json);
+                onComplete?.Invoke(new AnalyticsSubmissionResponse { status = "queued" });
+                return;
+            }
+
             _coroutineRunner.StartCoroutine(SendEventCoroutine(json, onComplete));
         }
 
