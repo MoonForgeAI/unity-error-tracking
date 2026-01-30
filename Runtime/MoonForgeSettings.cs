@@ -45,6 +45,17 @@ namespace MoonForge.ErrorTracking
         // ADVANCED SETTINGS (Hidden by default in inspector)
         // ═══════════════════════════════════════════════════════════════════
 
+        [Header("═══ ANALYTICS ═══")]
+        [Tooltip("Enable analytics tracking (screen views, custom events, user identification)")]
+        public bool enableAnalytics = true;
+
+        [Tooltip("Automatically track scene/screen views when scenes are loaded")]
+        public bool trackSceneViewsAutomatically = true;
+
+        [Tooltip("Session timeout in seconds. A new session starts after this period of inactivity.")]
+        [Range(60, 7200)]
+        public int sessionTimeoutSeconds = 1800;
+
         [Header("═══ ADVANCED (Optional) ═══")]
         [Tooltip("API endpoint base URL - the URL of your MoonForge collector service (without /api/errors)")]
         public string apiEndpoint = "https://collector.moonforge.co";
@@ -233,6 +244,11 @@ namespace MoonForge.ErrorTracking
             // Debug
             config.debugMode = debugMode;
             config.enableInEditor = enableInEditor;
+
+            // Analytics
+            config.enableAnalytics = enableAnalytics;
+            config.trackSceneViewsAutomatically = trackSceneViewsAutomatically;
+            config.sessionTimeoutSeconds = sessionTimeoutSeconds;
 
             return config;
         }

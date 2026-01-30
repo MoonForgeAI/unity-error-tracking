@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using MoonForge.ErrorTracking.Analytics;
 
 namespace MoonForge.ErrorTracking
 {
@@ -144,11 +145,27 @@ namespace MoonForge.ErrorTracking
 
             // Send any stored offline errors
             SendStoredErrors();
+
+            // Initialize analytics if enabled
+            if (_config.enableAnalytics)
+            {
+                MoonForgeAnalytics.Initialize(_config, this);
+                if (_config.debugMode)
+                {
+                    Debug.Log("[MoonForge] Analytics initialized");
+                }
+            }
         }
 
         private void OnDestroy()
         {
             _isShuttingDown = true;
+
+            // Shutdown analytics
+            if (MoonForgeAnalytics.IsInitialized)
+            {
+                MoonForgeAnalytics.Shutdown();
+            }
 
             if (_exceptionHandler != null)
             {
@@ -208,6 +225,12 @@ namespace MoonForge.ErrorTracking
             {
                 // Try to send stored errors when app resumes
                 SendStoredErrors();
+
+                // Flush any queued analytics events
+                if (MoonForgeAnalytics.IsInitialized)
+                {
+                    MoonForgeAnalytics.Flush();
+                }
             }
         }
 

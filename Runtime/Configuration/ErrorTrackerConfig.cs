@@ -106,6 +106,17 @@ namespace MoonForge.ErrorTracking
         [Tooltip("Automatically upload symbol files after builds for symbolication")]
         public bool autoUploadSymbols = true;
 
+        [Header("Analytics Settings")]
+        [Tooltip("Enable analytics tracking (screen views, custom events, user identification)")]
+        public bool enableAnalytics = true;
+
+        [Tooltip("Automatically track scene/screen views when scenes are loaded")]
+        public bool trackSceneViewsAutomatically = true;
+
+        [Tooltip("Session timeout in seconds. A new session starts after this period of inactivity.")]
+        [Range(60, 7200)]
+        public int sessionTimeoutSeconds = 1800;
+
         [Header("Debug Settings")]
         [Tooltip("Enable debug logging for the SDK")]
         public bool debugMode = false;
@@ -169,5 +180,14 @@ namespace MoonForge.ErrorTracking
         /// Get the collector URL (alias for apiEndpoint for backwards compatibility)
         /// </summary>
         public string collectorUrl => apiEndpoint;
+
+        /// <summary>
+        /// Get the full API URL for analytics event submission
+        /// </summary>
+        public string GetAnalyticsApiUrl()
+        {
+            var baseUrl = apiEndpoint.TrimEnd('/');
+            return $"{baseUrl}/api/send";
+        }
     }
 }
