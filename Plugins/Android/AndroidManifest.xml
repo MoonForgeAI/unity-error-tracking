@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.moonforge.errortracking">
+
+    <!-- Required for all HTTP/HTTPS network calls -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- Required to check network connectivity before sending events -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+</manifest>

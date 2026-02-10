@@ -97,10 +97,19 @@ namespace MoonForge.ErrorTracking
                     }
 
                     // Final failure
+                    var singleErrorMessage = request.error ?? $"HTTP {request.responseCode}";
+                    var singleResponseBody = request.downloadHandler?.text;
+
+                    if (_config.debugMode)
+                    {
+                        Debug.LogWarning($"[MoonForge] Error send failed ({request.responseCode}): {singleErrorMessage}\n" +
+                            $"URL: {url}\nResponse: {singleResponseBody ?? "(no response body)"}");
+                    }
+
                     response = new ErrorSubmissionResponse
                     {
                         status = "error",
-                        error = request.error ?? $"HTTP {request.responseCode}"
+                        error = singleErrorMessage
                     };
 
                     // Check for rate limiting
@@ -182,11 +191,11 @@ namespace MoonForge.ErrorTracking
                     // Final failure
                     var errorMessage = request.error ?? $"HTTP {request.responseCode}";
 
-                    // Log response body for debugging client errors (4xx)
-                    if (_config.debugMode && request.responseCode >= 400 && request.responseCode < 500)
+                    if (_config.debugMode)
                     {
                         var responseBody = request.downloadHandler?.text ?? "(no response body)";
-                        Debug.LogWarning($"[MoonForge] Batch send failed: {errorMessage}\nResponse: {responseBody}");
+                        Debug.LogWarning($"[MoonForge] Batch send failed ({request.responseCode}): {errorMessage}\n" +
+                            $"URL: {url}\nResponse: {responseBody}");
                     }
 
                     response = new BatchSubmissionResponse
@@ -209,6 +218,8 @@ namespace MoonForge.ErrorTracking
             request.uploadHandler = new UploadHandlerRaw(bodyRaw);
             request.downloadHandler = new DownloadHandlerBuffer();
             request.SetRequestHeader("Content-Type", "application/json");
+            request.SetRequestHeader("User-Agent",
+                $"MoonForge-Unity-SDK/1.0.2 UnityPlayer/{Application.unityVersion} ({Application.platform})");
 
             return request;
         }

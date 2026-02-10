@@ -118,8 +118,10 @@ namespace MoonForge.ErrorTracking
                     return build.GetStatic<string>("MANUFACTURER");
                 }
             }
-            catch
+            catch (Exception ex)
             {
+                Debug.LogWarning($"[MoonForge] JNI call failed in GetAndroidManufacturer: {ex.Message}. " +
+                    "This may occur if called from a non-main thread.");
                 return null;
             }
 #else
@@ -236,9 +238,10 @@ namespace MoonForge.ErrorTracking
                     }
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                // Thermal API not available on this device/version
+                Debug.LogWarning($"[MoonForge] JNI call failed in GetAndroidThermalState: {ex.Message}. " +
+                    "Thermal API may not be available on this device/Android version.");
             }
             return null;
 #else
@@ -284,9 +287,10 @@ namespace MoonForge.ErrorTracking
                     }
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                // Telephony service not available
+                Debug.LogWarning($"[MoonForge] JNI call failed in GetAndroidCarrier: {ex.Message}. " +
+                    "This may occur if called from a non-main thread.");
             }
             return null;
 #else

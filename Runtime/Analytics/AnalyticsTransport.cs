@@ -95,9 +95,20 @@ namespace MoonForge.ErrorTracking.Analytics
 
                 if (request.result == UnityWebRequest.Result.Success)
                 {
+                    var responseText = request.downloadHandler.text;
+
+                    // Detect bot detection rejection - the collector returns { beep: "boop" }
+                    // when it doesn't recognize the client as a valid game client
+                    if (_config.debugMode && responseText != null && responseText.Contains("beep"))
+                    {
+                        Debug.LogWarning("[MoonForge Analytics] Server returned bot detection response. " +
+                            "This usually means the User-Agent header is missing or invalid. " +
+                            $"Response: {responseText}");
+                    }
+
                     try
                     {
-                        response = JsonUtility.FromJson<AnalyticsSubmissionResponse>(request.downloadHandler.text);
+                        response = JsonUtility.FromJson<AnalyticsSubmissionResponse>(responseText);
                         if (_config.debugMode)
                         {
                             Debug.Log($"[MoonForge Analytics] Event sent successfully");
@@ -114,10 +125,19 @@ namespace MoonForge.ErrorTracking.Analytics
                 }
                 else
                 {
+                    var analyticsErrorMessage = request.error ?? $"HTTP {request.responseCode}";
+                    var analyticsResponseBody = request.downloadHandler?.text;
+
+                    if (_config.debugMode)
+                    {
+                        Debug.LogWarning($"[MoonForge Analytics] Event send failed ({request.responseCode}): {analyticsErrorMessage}\n" +
+                            $"URL: {url}\nResponse: {analyticsResponseBody ?? "(no response body)"}");
+                    }
+
                     response = new AnalyticsSubmissionResponse
                     {
                         status = "error",
-                        error = request.error ?? $"HTTP {request.responseCode}"
+                        error = analyticsErrorMessage
                     };
 
                     // Queue for retry on network errors
@@ -145,6 +165,8 @@ namespace MoonForge.ErrorTracking.Analytics
             request.uploadHandler = new UploadHandlerRaw(bodyRaw);
             request.downloadHandler = new DownloadHandlerBuffer();
             request.SetRequestHeader("Content-Type", "application/json");
+            request.SetRequestHeader("User-Agent",
+                $"MoonForge-Unity-SDK/1.0.2 UnityPlayer/{Application.unityVersion} ({Application.platform})");
 
             return request;
         }
