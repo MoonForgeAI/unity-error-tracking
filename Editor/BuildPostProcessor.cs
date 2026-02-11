@@ -310,9 +310,9 @@ namespace MoonForge.ErrorTracking.Editor
         private bool IsIL2CPPBuild()
         {
 #if UNITY_IOS
-            return PlayerSettings.GetScriptingBackend(BuildTargetGroup.iOS) == ScriptingBackend.IL2CPP;
+            return PlayerSettings.GetScriptingBackend(BuildTargetGroup.iOS) == ScriptingImplementation.IL2CPP;
 #elif UNITY_ANDROID
-            return PlayerSettings.GetScriptingBackend(BuildTargetGroup.Android) == ScriptingBackend.IL2CPP;
+            return PlayerSettings.GetScriptingBackend(BuildTargetGroup.Android) == ScriptingImplementation.IL2CPP;
 #else
             return false;
 #endif
