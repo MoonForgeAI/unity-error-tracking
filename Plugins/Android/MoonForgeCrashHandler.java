@@ -295,7 +295,8 @@ public class MoonForgeCrashHandler {
      * @param crashType 0=SIGSEGV, 1=SIGABRT, 2=SIGBUS
      */
     public void simulateCrash(int crashType) {
-        if (BuildConfig.DEBUG) {
+        boolean isDebuggable = (context.getApplicationInfo().flags & android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE) != 0;
+        if (isDebuggable) {
             Log.w(TAG, "Simulating crash type " + crashType);
             nativeSimulateCrash(crashType);
         } else {
