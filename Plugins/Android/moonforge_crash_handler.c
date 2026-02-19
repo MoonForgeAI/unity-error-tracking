@@ -310,10 +310,3 @@ JNIEXPORT void JNICALL Java_com_moonforge_errortracking_CrashHandler_nativeSimul
     LOGD("SimulateCrash is only available in debug builds");
 #endif
 }
-
-// Unity calls this on library load
-JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* reserved) {
-    javaVM = vm;
-    LOGD("JNI_OnLoad: JavaVM set");
-    return JNI_VERSION_1_6;
-}
