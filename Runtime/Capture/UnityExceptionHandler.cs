@@ -419,8 +419,9 @@ namespace MoonForge.ErrorTracking
         private string GetIOSBuildNumber()
         {
 #if UNITY_IOS && !UNITY_EDITOR
-            // iOS build number requires native plugin or Info.plist access
-            return PlayerSettings.iOS.buildNumber;
+            // Application.version reads CFBundleShortVersionString from Info.plist at runtime.
+            // PlayerSettings.iOS.buildNumber is editor-only and cannot be used in builds.
+            return Application.version;
 #else
             return "unknown";
 #endif
