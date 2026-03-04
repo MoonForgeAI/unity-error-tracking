@@ -383,6 +383,10 @@ namespace MoonForge.ErrorTracking.Analytics
                     _sessionId = Guid.NewGuid().ToString();
                     _sessionStartTime = now;
 
+                    // Update timestamp BEFORE calling TrackEvent to prevent
+                    // infinite recursion (TrackEvent -> UpdateLastActivity -> TrackEvent)
+                    _lastActivityTime = now;
+
                     if (_config.debugMode)
                     {
                         Debug.Log($"[MoonForge Analytics] Session timed out, starting new session: {_sessionId}");
@@ -394,6 +398,8 @@ namespace MoonForge.ErrorTracking.Analytics
                         { "session_id", _sessionId },
                         { "previous_session_id", oldSessionId }
                     });
+
+                    return;
                 }
             }
 
