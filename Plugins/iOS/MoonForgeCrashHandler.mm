@@ -43,8 +43,8 @@ static char crashJsonBuffer[32768];
 
 #pragma mark - Signal Handler
 
-static const char* signalName(int signal) {
-    switch (signal) {
+static const char* signalName(int sig) {
+    switch (sig) {
         case SIGABRT: return "SIGABRT";
         case SIGBUS: return "SIGBUS";
         case SIGFPE: return "SIGFPE";
@@ -56,8 +56,8 @@ static const char* signalName(int signal) {
     }
 }
 
-static const char* signalDescription(int signal) {
-    switch (signal) {
+static const char* signalDescription(int sig) {
+    switch (sig) {
         case SIGABRT: return "Abort signal";
         case SIGBUS: return "Bus error (bad memory access)";
         case SIGFPE: return "Floating-point exception";
@@ -108,7 +108,7 @@ static void captureStackTrace(char* buffer, size_t bufferSize) {
     }
 }
 
-static void signalHandler(int signal, siginfo_t* info, void* context) {
+static void signalHandler(int sig, siginfo_t* info, void* context) {
     // Prevent re-entry
     if (isHandlingCrash) {
         return;
@@ -135,9 +135,9 @@ static void signalHandler(int signal, siginfo_t* info, void* context) {
         "\"threadId\":%u,"
         "\"frames\":%s"
         "}",
-        signal,
-        signalName(signal),
-        signalDescription(signal),
+        sig,
+        signalName(sig),
+        signalDescription(sig),
         faultAddress,
         thread,
         stackTraceJson
@@ -149,17 +149,17 @@ static void signalHandler(int signal, siginfo_t* info, void* context) {
     }
 
     // Re-raise the signal with the original handler
-    struct sigaction* previousHandler = &previousHandlers[signal];
+    struct sigaction* previousHandler = &previousHandlers[sig];
     if (previousHandler->sa_flags & SA_SIGINFO) {
         if (previousHandler->sa_sigaction) {
-            previousHandler->sa_sigaction(signal, info, context);
+            previousHandler->sa_sigaction(sig, info, context);
         }
     } else if (previousHandler->sa_handler != SIG_DFL && previousHandler->sa_handler != SIG_IGN) {
-        previousHandler->sa_handler(signal);
+        previousHandler->sa_handler(sig);
     } else {
         // Reset to default and re-raise
-        signal(signal, SIG_DFL);
-        raise(signal);
+        signal(sig, SIG_DFL);
+        raise(sig);
     }
 }
 

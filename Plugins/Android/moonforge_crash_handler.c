@@ -61,8 +61,8 @@ static void* stackFrames[MAX_FRAMES];
 static int stackFrameCount = 0;
 
 // Signal names
-static const char* signalName(int signal) {
-    switch (signal) {
+static const char* signalName(int sig) {
+    switch (sig) {
         case SIGABRT: return "SIGABRT";
         case SIGBUS: return "SIGBUS";
         case SIGFPE: return "SIGFPE";
@@ -74,8 +74,8 @@ static const char* signalName(int signal) {
     }
 }
 
-static const char* signalDescription(int signal) {
-    switch (signal) {
+static const char* signalDescription(int sig) {
+    switch (sig) {
         case SIGABRT: return "Abort signal";
         case SIGBUS: return "Bus error (bad memory access)";
         case SIGFPE: return "Floating-point exception";
@@ -148,14 +148,14 @@ static void formatStackTraceJson(char* buffer, size_t bufferSize, void** frames,
 }
 
 // Signal handler
-static void signalHandler(int signal, siginfo_t* info, void* context) {
+static void signalHandler(int sig, siginfo_t* info, void* context) {
     // Prevent re-entry
     if (isHandlingCrash) {
         return;
     }
     isHandlingCrash = 1;
 
-    LOGE("Caught signal %d (%s)", signal, signalName(signal));
+    LOGE("Caught signal %d (%s)", sig, signalName(sig));
 
     // Get fault address
     void* faultAddress = info ? info->si_addr : NULL;
@@ -181,9 +181,9 @@ static void signalHandler(int signal, siginfo_t* info, void* context) {
         "\"siCode\":%d,"
         "\"frames\":%s"
         "}",
-        signal,
-        signalName(signal),
-        signalDescription(signal),
+        sig,
+        signalName(sig),
+        signalDescription(sig),
         faultAddress,
         (unsigned long)thread,
         info ? info->si_code : 0,
@@ -196,13 +196,13 @@ static void signalHandler(int signal, siginfo_t* info, void* context) {
     }
 
     // Re-raise the signal with the original handler
-    struct sigaction* previousHandler = &previousHandlers[signal];
+    struct sigaction* previousHandler = &previousHandlers[sig];
 
     // Uninstall our handler first
-    sigaction(signal, previousHandler, NULL);
+    sigaction(sig, previousHandler, NULL);
 
     // Re-raise the signal
-    raise(signal);
+    raise(sig);
 }
 
 // Public API implementation
