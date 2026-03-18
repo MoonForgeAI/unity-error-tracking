@@ -144,6 +144,7 @@ namespace MoonForge.ErrorTracking.Analytics
                 payload = new AnalyticsEventPayload
                 {
                     game = _config.gameId,
+                    id = _distinctId,
                     screen = $"{Screen.width}x{Screen.height}",
                     language = GetLanguageCode(),
                     url = $"scene://{screenName}",
@@ -203,6 +204,7 @@ namespace MoonForge.ErrorTracking.Analytics
                 payload = new AnalyticsEventPayload
                 {
                     game = _config.gameId,
+                    id = _distinctId,
                     screen = $"{Screen.width}x{Screen.height}",
                     language = GetLanguageCode(),
                     url = !string.IsNullOrEmpty(_currentScene) ? $"scene://{_currentScene}" : null,

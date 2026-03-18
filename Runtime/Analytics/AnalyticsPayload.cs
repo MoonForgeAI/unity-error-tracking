@@ -51,6 +51,11 @@ namespace MoonForge.ErrorTracking.Analytics
         public string name;
 
         /// <summary>
+        /// Distinct user ID for unique user tracking
+        /// </summary>
+        public string id;
+
+        /// <summary>
         /// Custom event data
         /// </summary>
         public Dictionary<string, object> data;

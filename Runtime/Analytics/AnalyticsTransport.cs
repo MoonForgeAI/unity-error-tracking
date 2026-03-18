@@ -337,6 +337,9 @@ namespace MoonForge.ErrorTracking.Analytics
 
             fields.Add($"\"game\":\"{EscapeJsonString(p.game)}\"");
 
+            if (!string.IsNullOrEmpty(p.id))
+                fields.Add($"\"id\":\"{EscapeJsonString(p.id)}\"");
+
             if (!string.IsNullOrEmpty(p.hostname))
                 fields.Add($"\"hostname\":\"{EscapeJsonString(p.hostname)}\"");
 
