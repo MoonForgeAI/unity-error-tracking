@@ -618,5 +618,5 @@ MoonForgeAnalytics.Flush();
 ## Support
 
 - **Documentation**: https://docs.moonforge.co
-- **Dashboard**: https://app.moonforge.co
+- **Dashboard**: https://game.moonforge.co
 - **GitHub Issues**: https://github.com/MoonForgeAI/unity-error-tracking/issues
