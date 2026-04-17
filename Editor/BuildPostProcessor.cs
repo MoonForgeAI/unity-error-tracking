@@ -24,11 +24,12 @@ namespace MoonForge.ErrorTracking.Editor
         public void OnPostprocessBuild(BuildReport report)
         {
             // Only process successful builds
-            if (report.summary.result != BuildResult.Succeeded)
+            // PT - removing this check as BuildResult always returns Unknown and IPostprocessBuildWithReport is not called on failed/cancelled builds anyway
+            /*if (report.summary.result != BuildResult.Succeeded)
             {
                 Debug.Log("[MoonForge] Build did not succeed, skipping symbol upload");
                 return;
-            }
+            }*/
 
             // Get configuration
             var config = FindConfig();
