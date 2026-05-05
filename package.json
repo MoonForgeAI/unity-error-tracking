@@ -1,6 +1,6 @@
 {
   "name": "com.moonforge.errortracking",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "displayName": "MoonForge Agentic Tracking",
   "description": "Production-ready error tracking and analytics for Unity games. Captures crashes, exceptions, network errors, and user analytics with full context.",
   "unity": "2021.3",

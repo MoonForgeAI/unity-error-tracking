@@ -24,7 +24,7 @@ namespace MoonForge.ErrorTracking.Editor
         private bool _stylesInitialized = false;
 
         private const string DOCS_URL = "https://docs.moonforge.dev/unity-sdk";
-        private const string DASHBOARD_URL = "https://app.moonforge.dev";
+        private const string DASHBOARD_URL = "https://game.moonforge.co";
 
         [MenuItem("MoonForge/Setup Error Tracking", false, 0)]
         public static void ShowWindow()
