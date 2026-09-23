@@ -166,7 +166,7 @@ namespace MoonForge.ErrorTracking.Analytics
             request.downloadHandler = new DownloadHandlerBuffer();
             request.SetRequestHeader("Content-Type", "application/json");
             request.SetRequestHeader("User-Agent",
-                $"MoonForge-Unity-SDK/1.0.2 UnityPlayer/{Application.unityVersion} ({Application.platform})");
+                $"{SdkInfo.UserAgentProduct} UnityPlayer/{Application.unityVersion} ({Application.platform})");
 
             return request;
         }
@@ -364,7 +364,7 @@ namespace MoonForge.ErrorTracking.Analytics
             if (p.data != null && p.data.Count > 0)
                 fields.Add($"\"data\":{SerializeDictionary(p.data)}");
 
-            fields.Add($"\"timestamp\":{p.timestamp}");
+            fields.Add($"\"timestamp\":{JsonNumber.Format(p.timestamp)}");
 
             sb.Append(string.Join(",", fields));
             sb.Append("}}");
@@ -388,7 +388,7 @@ namespace MoonForge.ErrorTracking.Analytics
             if (p.data != null && p.data.Count > 0)
                 fields.Add($"\"data\":{SerializeDictionary(p.data)}");
 
-            fields.Add($"\"timestamp\":{p.timestamp}");
+            fields.Add($"\"timestamp\":{JsonNumber.Format(p.timestamp)}");
 
             sb.Append(string.Join(",", fields));
             sb.Append("}}");
@@ -424,14 +424,14 @@ namespace MoonForge.ErrorTracking.Analytics
             if (value is bool b)
                 return b ? "true" : "false";
 
-            if (value is int || value is long || value is float || value is double || value is decimal)
-                return value.ToString();
+            if (JsonNumber.TryFormat(value, out var number))
+                return number;
 
             if (value is Dictionary<string, object> dict)
                 return SerializeDictionary(dict);
 
             // Fallback for other types
-            return $"\"{EscapeJsonString(value.ToString())}\"";
+            return $"\"{EscapeJsonString(JsonNumber.InvariantText(value))}\"";
         }
 
         private string EscapeJsonString(string s)

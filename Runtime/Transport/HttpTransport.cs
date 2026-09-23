@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -219,7 +218,7 @@ namespace MoonForge.ErrorTracking
             request.downloadHandler = new DownloadHandlerBuffer();
             request.SetRequestHeader("Content-Type", "application/json");
             request.SetRequestHeader("User-Agent",
-                $"MoonForge-Unity-SDK/1.0.2 UnityPlayer/{Application.unityVersion} ({Application.platform})");
+                $"{SdkInfo.UserAgentProduct} UnityPlayer/{Application.unityVersion} ({Application.platform})");
 
             return request;
         }
@@ -349,7 +348,7 @@ namespace MoonForge.ErrorTracking
                 fields.Add($"\"breadcrumbs\":{SerializeBreadcrumbs(p.breadcrumbs)}");
 
             if (p.timestamp.HasValue)
-                fields.Add($"\"timestamp\":{p.timestamp.Value}");
+                fields.Add($"\"timestamp\":{JsonNumber.Format(p.timestamp.Value)}");
 
             if (p.networkRequest != null)
                 fields.Add($"\"networkRequest\":{SerializeNetworkRequest(p.networkRequest)}");
@@ -407,7 +406,7 @@ namespace MoonForge.ErrorTracking
                 fields.Add($"\"breadcrumbs\":{SerializeBreadcrumbs(item.breadcrumbs)}");
 
             if (item.timestamp.HasValue)
-                fields.Add($"\"timestamp\":{item.timestamp.Value}");
+                fields.Add($"\"timestamp\":{JsonNumber.Format(item.timestamp.Value)}");
 
             if (item.networkRequest != null)
                 fields.Add($"\"networkRequest\":{SerializeNetworkRequest(item.networkRequest)}");
@@ -441,9 +440,9 @@ namespace MoonForge.ErrorTracking
             if (!string.IsNullOrEmpty(frame.filename))
                 fields.Add($"\"filename\":\"{EscapeJsonString(frame.filename)}\"");
             if (frame.lineno > 0)
-                fields.Add($"\"lineno\":{frame.lineno}");
+                fields.Add($"\"lineno\":{JsonNumber.Format(frame.lineno)}");
             if (frame.colno > 0)
-                fields.Add($"\"colno\":{frame.colno}");
+                fields.Add($"\"colno\":{JsonNumber.Format(frame.colno)}");
             if (!string.IsNullOrEmpty(frame.instructionAddress))
                 fields.Add($"\"instructionAddress\":\"{EscapeJsonString(frame.instructionAddress)}\"");
             if (!string.IsNullOrEmpty(frame.symbolAddress))
@@ -469,15 +468,15 @@ namespace MoonForge.ErrorTracking
             if (!string.IsNullOrEmpty(device.cpuArchitecture))
                 fields.Add($"\"cpuArchitecture\":\"{EscapeJsonString(device.cpuArchitecture)}\"");
             if (device.memoryUsedMb.HasValue)
-                fields.Add($"\"memoryUsedMb\":{device.memoryUsedMb.Value.ToString(CultureInfo.InvariantCulture)}");
+                fields.Add($"\"memoryUsedMb\":{JsonNumber.Format(device.memoryUsedMb.Value)}");
             if (device.memoryAvailableMb.HasValue)
-                fields.Add($"\"memoryAvailableMb\":{device.memoryAvailableMb.Value.ToString(CultureInfo.InvariantCulture)}");
+                fields.Add($"\"memoryAvailableMb\":{JsonNumber.Format(device.memoryAvailableMb.Value)}");
             if (device.cpuUsagePercent.HasValue)
-                fields.Add($"\"cpuUsagePercent\":{device.cpuUsagePercent.Value.ToString(CultureInfo.InvariantCulture)}");
+                fields.Add($"\"cpuUsagePercent\":{JsonNumber.Format(device.cpuUsagePercent.Value)}");
             if (device.fps.HasValue)
-                fields.Add($"\"fps\":{device.fps.Value.ToString(CultureInfo.InvariantCulture)}");
+                fields.Add($"\"fps\":{JsonNumber.Format(device.fps.Value)}");
             if (device.batteryLevel.HasValue)
-                fields.Add($"\"batteryLevel\":{device.batteryLevel.Value.ToString(CultureInfo.InvariantCulture)}");
+                fields.Add($"\"batteryLevel\":{JsonNumber.Format(device.batteryLevel.Value)}");
             if (device.batteryCharging.HasValue)
                 fields.Add($"\"batteryCharging\":{(device.batteryCharging.Value ? "true" : "false")}");
             if (!string.IsNullOrEmpty(device.thermalState))
@@ -540,7 +539,7 @@ namespace MoonForge.ErrorTracking
             fields.Add($"\"level\":\"{EscapeJsonString(bc.level)}\"");
             if (bc.data != null && bc.data.Count > 0)
                 fields.Add($"\"data\":{SerializeObjectDictionary(bc.data)}");
-            fields.Add($"\"timestamp\":{bc.timestamp}");
+            fields.Add($"\"timestamp\":{JsonNumber.Format(bc.timestamp)}");
 
             return "{" + string.Join(",", fields) + "}";
         }
@@ -552,9 +551,9 @@ namespace MoonForge.ErrorTracking
             fields.Add($"\"url\":\"{EscapeJsonString(req.url)}\"");
             fields.Add($"\"method\":\"{EscapeJsonString(req.method)}\"");
             if (req.statusCode.HasValue)
-                fields.Add($"\"statusCode\":{req.statusCode.Value}");
+                fields.Add($"\"statusCode\":{JsonNumber.Format(req.statusCode.Value)}");
             if (req.durationMs.HasValue)
-                fields.Add($"\"durationMs\":{req.durationMs.Value.ToString(CultureInfo.InvariantCulture)}");
+                fields.Add($"\"durationMs\":{JsonNumber.Format(req.durationMs.Value)}");
             if (req.requestHeaders != null && req.requestHeaders.Count > 0)
                 fields.Add($"\"requestHeaders\":{SerializeStringDictionary(req.requestHeaders)}");
             if (req.responseHeaders != null && req.responseHeaders.Count > 0)
@@ -597,18 +596,14 @@ namespace MoonForge.ErrorTracking
                 return "null";
             if (value is bool b)
                 return b ? "true" : "false";
-            if (value is int || value is long)
-                return value.ToString();
-            if (value is float f)
-                return f.ToString(CultureInfo.InvariantCulture);
-            if (value is double d)
-                return d.ToString(CultureInfo.InvariantCulture);
+            if (JsonNumber.TryFormat(value, out var number))
+                return number;
             if (value is string s)
                 return $"\"{EscapeJsonString(s)}\"";
             if (value is Dictionary<string, object> dict)
                 return SerializeObjectDictionary(dict);
             // Default to string representation
-            return $"\"{EscapeJsonString(value.ToString())}\"";
+            return $"\"{EscapeJsonString(JsonNumber.InvariantText(value))}\"";
         }
 
         private string EscapeJsonString(string str)
